@@ -51,6 +51,8 @@ export default function Player() {
         bufferingTime: formatInt(stats["bufferingTime"]),
         playTime: formatInt(stats["playTime"]),
         pauseTime: formatInt(stats["pauseTime"]),
+        rtt: formatInt(result?.rtt),
+        rto: formatInt(result?.rto),
       });
     }
   };

@@ -9,6 +9,8 @@ export interface Myparams {
   bufferingTime?: number | string;
   playTime?: number | string;
   pauseTime?: number | string;
+  rtt?: number | string;
+  rto?: number | string;
 }
 
 export const labels: string[] = [
