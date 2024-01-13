@@ -11,6 +11,7 @@ export interface Myparams {
   pauseTime?: number | string;
   rtt?: number | string;
   rto?: number | string;
+  delay?: number | string;
 }
 
 export const labels: string[] = [
@@ -26,4 +27,5 @@ export const labels: string[] = [
   "pauseTime",
   "rtt",
   "rto",
+  "delay",
 ];

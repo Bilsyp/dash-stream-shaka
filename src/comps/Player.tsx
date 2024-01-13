@@ -9,10 +9,9 @@ import Stats from "./Stats";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { config } from "@/lib/config";
 export default function Player() {
-  const [player, setPlayer] = useState<shaka.Player | null | undefined>(
-    undefined
-  );
+  const [player, setPlayer] = useState<shaka.Player | null>()!;
   const [hasErrorloadVideo, setHasErrorLoadVideo] = useState<null | string>(
     null
   );
@@ -21,7 +20,8 @@ export default function Player() {
   const handleTimeUpdate = async () => {
     const stats: any = player?.getStats();
     const result: any = await measureRTTAndRTO();
-
+    const delay =
+      stats?.loadLatency + stats?.streamBandwidth / stats?.estimatedBandwidth;
     if (stats) {
       labels.forEach((item) => {
         const element: Element | null = document.querySelector(`#${item}`);
@@ -37,6 +37,8 @@ export default function Player() {
               ? formatInt(result?.rtt)
               : item == "rto"
               ? formatInt(result?.rto)
+              : item == "delay"
+              ? formatInt(delay * 1000)
               : formatInt(stats[item]);
         }
       });
@@ -74,6 +76,8 @@ export default function Player() {
       await player?.load(
         "https://testbed-ndn-rg.stei.itb.ac.id/stream/playlist.mpd"
       );
+      // "http://localhost:3000/stream/playlist.mpd"
+      //
     } catch (error: unknown | any) {
       setHasErrorLoadVideo(error.message);
     }
@@ -82,25 +86,36 @@ export default function Player() {
   useEffect(() => {
     const initVideoApp = async () => {
       shaka.polyfill.installAll();
-
+      shaka.net.NetworkingEngine.registerScheme(
+        "http",
+        shaka.net.HttpFetchPlugin.parse,
+        shaka.net.NetworkingEngine.PluginPriority.PREFERRED
+      );
       const video = document.getElementById("video") as HTMLMediaElement;
       const videoContainer = document.getElementById(
         "video-container"
       ) as HTMLMediaElement;
 
       const localPlayer: shaka.Player = new shaka.Player();
-
+      localPlayer.configure(config);
       await localPlayer.attach(video);
 
       const ui = new shaka.ui.Overlay(localPlayer, videoContainer, video);
 
       const controls: shaka.ui.Controls | null = ui.getControls();
 
-      const player = controls?.getPlayer();
+      const player: shaka.Player | null | undefined = controls?.getPlayer();
+
       setPlayer(player);
       ui.configure({
         castReceiverAppId: "07AEE832",
         castAndroidReceiverCompatible: true,
+        seekBarColors: {
+          base: "rgba(255, 255, 255, 0.3)",
+          buffered: "rgba(255, 255, 255, 0.54)",
+          played: "red",
+        },
+        // seekOnTaps: true,
       });
     };
     initVideoApp();

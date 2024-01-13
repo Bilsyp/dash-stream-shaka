@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import hirestime from "hirestime";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -7,15 +8,16 @@ export function cn(...inputs: ClassValue[]) {
 export function formatInt(n: any): any {
   return Number.isNaN(n) ? "?" : `${Math.round(n)}`;
 }
+const getNow = hirestime();
+
 async function pingServer(): Promise<number> {
   try {
-    const startTime = new Date().getTime();
+    const t0 = getNow();
 
     await fetch("https://testbed-ndn-rg.stei.itb.ac.id/stream/ping");
-    const endTime = new Date().getTime();
-    const responseTime = endTime - startTime;
+    const timeMs = getNow() - t0;
 
-    return responseTime;
+    return timeMs;
   } catch (error) {
     return NaN;
   }
