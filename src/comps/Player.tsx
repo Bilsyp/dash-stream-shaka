@@ -55,6 +55,7 @@ export default function Player() {
         pauseTime: formatInt(stats["pauseTime"]),
         rtt: formatInt(result?.rtt),
         rto: formatInt(result?.rto),
+        delay: formatInt(delay * 1000),
       });
     }
   };
